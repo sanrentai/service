@@ -5,7 +5,6 @@ import (
 	"net/http"
 
 	"github.com/sanrentai/service"
-	"github.com/sanrentai/service/log"
 )
 
 func main() {
@@ -14,16 +13,27 @@ func main() {
 		DisplayName: "TEST",
 		Description: "this is a test",
 		Runfunc:     Run,
+		Stopfunc:    Close,
 	}
 	service.Run(prg)
 }
 
 func indexHandler(w http.ResponseWriter, r *http.Request) {
-	log.Info("hello world")
+	service.Info("hello world")
 	fmt.Fprintf(w, "hello world")
 }
 
-func Run() {
+var server *http.Server
+
+func Run() error {
 	http.HandleFunc("/", indexHandler)
-	http.ListenAndServe(":8000", nil)
+	server = &http.Server{Addr: ":8000"}
+	return server.ListenAndServe()
+}
+
+func Close() error {
+
+	service.Info("Close")
+	server.Close()
+	return nil
 }

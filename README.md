@@ -9,7 +9,6 @@ import (
 	"net/http"
 
 	"github.com/sanrentai/service"
-	"github.com/sanrentai/service/log"
 )
 
 func main() {
@@ -23,7 +22,7 @@ func main() {
 }
 
 func indexHandler(w http.ResponseWriter, r *http.Request) {
-	log.Info("hello world")
+	service.Info("hello world")
 	fmt.Fprintf(w, "hello world")
 }
 

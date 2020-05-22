@@ -15,8 +15,8 @@ type Program struct {
 	DisplayName string // Display name, spaces allowed.
 	Description string // Long description of service.
 	exit        chan struct{}
-	Runfunc     func()
-	Stopfunc    func()
+	Runfunc     func() error
+	Stopfunc    func() error
 }
 
 func (p *Program) Start(s service.Service) error {
@@ -30,18 +30,26 @@ func (p *Program) Start(s service.Service) error {
 	go p.run()
 	return nil
 }
-func (p *Program) run() error {
-	p.Runfunc()
 
+func (p *Program) run() error {
+	err := p.Runfunc()
+	if err != nil {
+		logger.Error(err)
+	}
 	return nil
 }
+
 func (p *Program) Stop(s service.Service) error {
 	// Any work in Stop should be quick, usually a few seconds at most.
 	logger.Info("I'm Stopping!")
-	close(p.exit)
+
 	if p.Stopfunc != nil {
-		p.Stopfunc()
+		err := p.Stopfunc()
+		if err != nil {
+			logger.Error(err)
+		}
 	}
+	close(p.exit)
 	return nil
 }
 
